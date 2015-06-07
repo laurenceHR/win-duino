@@ -6,7 +6,7 @@ From the original duino-project (Unix) to use it with node on Windows OS!
 For "duino" see: https://github.com/ecto/duino
 
 # install
-
+upload arduino/duino/duino.ino sketch
 npm install win-duino
 
 # Windows COM Port selection
@@ -23,19 +23,16 @@ var board = new arduino.Board({
 
 ````javascript
 var arduino = require('win-duino');
-
 var leonardo = new arduino.Board({
-  debug: true,
-  device: 'COM5'  
-});
-
-var led = new arduino.Led({
-  board: leonardo,
-  pin: 13
+  debug: true
+  ,device: 'COM5'
 });
 
 leonardo.on('ready', function(){
-  led.blink();
+  led = new arduino.Led({board:this,pin: 13});
+  led.on();
+}).on('end',function(){// When End Connection
+  led.off();
 });
 
 ````

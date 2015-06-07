@@ -7,18 +7,22 @@ int index = 0;
 
 char messageBuffer[12];
 char cmd[3];
+char txt[9];
 char pin[3];
 char val[4];
 char aux[4];
 
 Servo servo;
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 }
 
-void loop() {
-  while(Serial.available() > 0) {
+void loop()
+{
+  while(Serial.available() > 0)
+  {
     char x = Serial.read();
     if (x == '!') index = 0;      // start
     else if (x == '.') process(); // end
@@ -29,61 +33,100 @@ void loop() {
 /*
  * Deal with a full message and determine function to call
  */
-void process() {
+void process()
+{
   index = 0;
 
   strncpy(cmd, messageBuffer, 2);
   cmd[2] = '\0';
+  strncpy(txt, messageBuffer + 2, 5);
+  txt[7] = '\0';
   strncpy(pin, messageBuffer + 2, 2);
   pin[2] = '\0';
 
-  if (atoi(cmd) > 90) {
+  if (atoi(cmd) > 90)
+  {
     strncpy(val, messageBuffer + 4, 2);
     val[2] = '\0';
     strncpy(aux, messageBuffer + 6, 3);
     aux[3] = '\0';
-  } else {
+  }
+  else
+  {
     strncpy(val, messageBuffer + 4, 3);
     val[3] = '\0';
     strncpy(aux, messageBuffer + 7, 3);
     aux[3] = '\0';
   }
 
-  if (debug) {
-    Serial.println(messageBuffer);
+  if (debug)
+  {
+    //Serial.println(messageBuffer);
   }
+  Serial.print("messageBuffer:");
+  Serial.println(messageBuffer);
   int cmdid = atoi(cmd);
 
   // Serial.println(cmd);
   // Serial.println(pin);
   // Serial.println(val);
   // Serial.println(aux);
-
-  switch(cmdid) {
-    case 0:  sm(pin,val);              break;
-    case 1:  dw(pin,val);              break;
-    case 2:  dr(pin,val);              break;
-    case 3:  aw(pin,val);              break;
-    case 4:  ar(pin,val);              break;
-    case 97: handlePing(pin,val,aux);  break;
-    case 98: handleServo(pin,val,aux); break;
-    case 99: toggleDebug(val);         break;
-    default: notfound(cmdid);               break;
+  switch(cmdid)
+  {
+    case 0:
+      sm(pin, val);
+      break;
+    case 1:
+      dw(pin, val);
+      break;
+    case 2:
+      dr(pin, val);
+      break;
+    case 3:
+      aw(pin, val);
+      break;
+    case 4:
+      ar(pin, val);
+      break;
+    case 5:
+      dl(txt);
+      break;
+    case 97:
+      handlePing(pin, val, aux);
+      break;
+    case 98:
+      handleServo(pin, val, aux);
+      break;
+    case 99:
+      toggleDebug(val);
+      break;
+    default:
+      notfound(cmdid);
+      break;
   }
 }
 
-void notfound(int cmdid){
-	Serial.println("command not found");
+void notfound(int cmdid)
+{
+  Serial.println("command not found");
 }
-
+void dl(char *txt){
+  int ms = atoi(txt);
+    if (debug){ Serial.print("delay("); Serial.print(ms); Serial.println(")"); }
+  delay(ms);
+}
 /*
  * Toggle debug mode
  */
-void toggleDebug(char *val) {
-  if (atoi(val) == 0) {
+void toggleDebug(char *val)
+{
+  if (atoi(val) == 0)
+  {
     debug = false;
     Serial.println("goodbye");
-  } else {
+  }
+  else
+  {
     debug = true;
     Serial.println("hello");
   }
@@ -92,13 +135,21 @@ void toggleDebug(char *val) {
 /*
  * Set pin mode
  */
-void sm(char *pin, char *val) {
+void sm(char *pin, char *val)
+{
   if (debug) Serial.println("sm");
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
-  if (atoi(val) == 0) {
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
+  if (atoi(val) == 0)
+  {
     pinMode(p, OUTPUT);
-  } else {
+  }
+  else
+  {
     pinMode(p, INPUT);
   }
 }
@@ -106,14 +157,22 @@ void sm(char *pin, char *val) {
 /*
  * Digital write
  */
-void dw(char *pin, char *val) {
+void dw(char *pin, char *val)
+{
   if (debug) Serial.println("dw");
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
   pinMode(p, OUTPUT);
-  if (atoi(val) == 0) {
+  if (atoi(val) == 0)
+  {
     digitalWrite(p, LOW);
-  } else {
+  }
+  else
+  {
     digitalWrite(p, HIGH);
   }
 }
@@ -121,24 +180,34 @@ void dw(char *pin, char *val) {
 /*
  * Digital read
  */
-void dr(char *pin, char *val) {
+void dr(char *pin, char *val)
+{
   if (debug) Serial.println("dr");
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
   pinMode(p, INPUT);
   int oraw = digitalRead(p);
   char m[7];
-  sprintf(m, "%02d::%02d", p,oraw);
+  sprintf(m, "%02d::%02d", p, oraw);
   Serial.println(m);
 }
 
 /*
  * Analog read
  */
-void ar(char *pin, char *val) {
+void ar(char *pin, char *val)
+{
   if(debug) Serial.println("ar");
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
   pinMode(p, INPUT); // don't want to sw
   int rval = analogRead(p);
   char m[8];
@@ -146,29 +215,53 @@ void ar(char *pin, char *val) {
   Serial.println(m);
 }
 
-void aw(char *pin, char *val) {
+void aw(char *pin, char *val)
+{
   if(debug) Serial.println("aw");
   int p = getPin(pin);
   pinMode(p, OUTPUT);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
-  analogWrite(p,atoi(val));
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
+  analogWrite(p, atoi(val));
 }
 
-int getPin(char *pin) { //Converts to A0-A5, and returns -1 on error
+int getPin(char *pin)   //Converts to A0-A5, and returns -1 on error
+{
   int ret = -1;
-  if(pin[0] == 'A' || pin[0] == 'a') {
-    switch(pin[1]) {
-      case '0':  ret = A0; break;
-      case '1':  ret = A1; break;
-      case '2':  ret = A2; break;
-      case '3':  ret = A3; break;
-      case '4':  ret = A4; break;
-      case '5':  ret = A5; break;
-      default:             break;
+  if(pin[0] == 'A' || pin[0] == 'a')
+  {
+    switch(pin[1])
+    {
+      case '0':
+        ret = A0;
+        break;
+      case '1':
+        ret = A1;
+        break;
+      case '2':
+        ret = A2;
+        break;
+      case '3':
+        ret = A3;
+        break;
+      case '4':
+        ret = A4;
+        break;
+      case '5':
+        ret = A5;
+        break;
+      default:
+        break;
     }
-  } else {
+  }
+  else
+  {
     ret = atoi(pin);
-    if(ret == 0 && (pin[0] != '0' || pin[1] != '0')) {
+    if(ret == 0 && (pin[0] != '0' || pin[1] != '0'))
+    {
       ret = -1;
     }
   }
@@ -179,15 +272,21 @@ int getPin(char *pin) { //Converts to A0-A5, and returns -1 on error
  * Handle Ping commands
  * fire, read
  */
-void handlePing(char *pin, char *val, char *aux) {
+void handlePing(char *pin, char *val, char *aux)
+{
   if (debug) Serial.println("ss");
   int p = getPin(pin);
 
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
   Serial.println("got signal");
 
   // 01(1) Fire and Read
-  if (atoi(val) == 1) {
+  if (atoi(val) == 1)
+  {
     char m[16];
 
     pinMode(p, OUTPUT);
@@ -211,29 +310,39 @@ void handlePing(char *pin, char *val, char *aux) {
  * Handle Servo commands
  * attach, detach, write, read, writeMicroseconds, attached
  */
-void handleServo(char *pin, char *val, char *aux) {
+void handleServo(char *pin, char *val, char *aux)
+{
   if (debug) Serial.println("ss");
   int p = getPin(pin);
-  if(p == -1) { if(debug) Serial.println("badpin"); return; }
+  if(p == -1)
+  {
+    if(debug) Serial.println("badpin");
+    return;
+  }
   Serial.println("signal: servo");
 
   // 00(0) Detach
-  if (atoi(val) == 0) {
+  if (atoi(val) == 0)
+  {
     servo.detach();
     char m[12];
     sprintf(m, "%s::detached", pin);
     Serial.println(m);
 
-  // 01(1) Attach
-  } else if (atoi(val) == 1) {
+    // 01(1) Attach
+  }
+  else if (atoi(val) == 1)
+  {
     // servo.attach(p, 750, 2250);
     servo.attach(p);
     char m[12];
     sprintf(m, "%s::attached", pin);
     Serial.println(m);
 
-  // 02(2) Write
-  } else if (atoi(val) == 2) {
+    // 02(2) Write
+  }
+  else if (atoi(val) == 2)
+  {
     Serial.println("writing to servo");
     Serial.println(atoi(aux));
     // Write to servo
@@ -245,8 +354,10 @@ void handleServo(char *pin, char *val, char *aux) {
     // delayMicroseconds(pulseWidth);  // pulse width
     // digitalWrite(pin, LOW);    // stop the pulse
 
-  // 03(3) Read
-  } else if (atoi(val) == 3) {
+    // 03(3) Read
+  }
+  else if (atoi(val) == 3)
+  {
     Serial.println("reading servo");
     int sval = servo.read();
     char m[13];
