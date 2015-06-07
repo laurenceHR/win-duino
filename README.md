@@ -7,7 +7,7 @@ For "duino" see: https://github.com/ecto/duino
 
 # install
 
-change only the ./lib/board.js 
+npm install win-duino
 
 # Windows COM Port selection
 
@@ -22,19 +22,19 @@ var board = new arduino.Board({
 # usage
 
 ````javascript
-var arduino = require('../');
+var arduino = require('win-duino');
 
-var board = new arduino.Board({
+var leonardo = new arduino.Board({
   debug: true,
   device: 'COM5'  
 });
 
 var led = new arduino.Led({
-  board: board,
+  board: leonardo,
   pin: 13
 });
 
-board.on('ready', function(){
+leonardo.on('ready', function(){
   led.blink();
 });
 
