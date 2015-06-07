@@ -6,8 +6,8 @@ From the original duino-project (Unix) to use it with node on Windows OS!
 For "duino" see: https://github.com/ecto/duino
 
 # install
-upload arduino/duino/duino.ino sketch
-npm install win-duino
+1. upload arduino/duino/duino.ino sketch
+2. npm install win-duino
 
 # Windows COM Port selection
 
