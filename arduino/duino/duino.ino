@@ -68,8 +68,12 @@ void process() {
     case 97: handlePing(pin,val,aux);  break;
     case 98: handleServo(pin,val,aux); break;
     case 99: toggleDebug(val);         break;
-    default:                           break;
+    default: notfound(cmdid);               break;
   }
+}
+
+void notfound(int cmdid){
+	Serial.println("command not found");
 }
 
 /*
