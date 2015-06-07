@@ -14,8 +14,8 @@ change only the ./lib/board.js
 ````javascript
 var board = new arduino.Board({
   debug: true,
-  device: 'COM22',
-  baudrate: 115200
+  device: 'COM5',
+  baudrate: 9600
 });
 ````
 
@@ -26,19 +26,18 @@ var arduino = require('../');
 
 var board = new arduino.Board({
   debug: true,
-  device: 'COM22',
-  baudrate: 115200
+  device: 'COM5'  
 });
 
 var led = new arduino.Led({
   board: board,
-  pin: 2
+  pin: 13
 });
 
 board.on('ready', function(){
   led.blink();
 });
-;
+
 ````
 
 # documentation
